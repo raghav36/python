@@ -2,38 +2,9 @@ import sys
 
 board = ['-']*9
 gameOver = False
+prevChoice = '-'
 
-while gameOver == False: 
-    #user input for X or 0
-    inputChoice = input("Enter X or 0")
-
-    #user input for board position
-    inputDestination = input("Enter a value between 1 to 9")
-
-    #validate user input
-    isValidInput = validate_user_input(inputChoice, inputDestination)
-    if(isValidInput == False):
-        sys.exit()
-
-    inputDestination = int(inputDestination)
-
-    #check if board position is available
-    isValidBoardPosition = validate_board_position(board, inputDestination)
-    if(isValidBoardPosition == False):
-        sys.exit()
-
-    board[inputDestination-1] = inputChoice
-
-    #game is over if there is a winner or a tie
-    gameOver = check_for_winner(board) or check_for_tie(board)
-
-    inputNewGame = input("Do you want to start a new game? (Yes/No)")
-    if inputNewGame == 'Yes':
-        board = ['-']*9
-        gameOver = False
-        print("New game started")
-
-def validate_user_ input(inputChoice, inputDestination):
+def validate_user_input(inputChoice, inputDestination):
     #check if valid input destination
     if not str(inputDestination).isdigit() or int(inputDestination) < 0 or int(inputDestination) > 9:
         print("Invalid destination choice")
@@ -78,4 +49,51 @@ def check_for_winner(board):
 
 def check_for_tie(board):
     #check if any empty position is present
-    return '-' in set(board)
+    if not '-' in set(board):
+        print("The game is a tie")
+        return True
+    return False
+
+def dispay_board(board):
+    for i in [0,3,6]:
+        print(" | " + board[i] + " | " + board[i+1] + " | " + board[i+2] + " | ")
+
+while gameOver == False: 
+    #user input for X or 0
+    inputChoice = input("Enter X or 0")
+
+    #user input for board position
+    inputDestination = input("Enter a value between 1 to 9")
+
+    #alternate turns between players
+    while (str(prevChoice) == str(inputChoice) and str(inputChoice) in ['X','0']):
+        inputChoice = input("Incorrect turn, Enter X or 0")
+
+    prevChoice = inputChoice
+
+    #validate user input
+    isValidInput = validate_user_input(inputChoice, inputDestination)
+    if(isValidInput == False):
+        sys.exit()
+
+    inputDestination = int(inputDestination)
+
+    #check if board position is available
+    isValidBoardPosition = validate_board_position(board, inputDestination)
+    if(isValidBoardPosition == False):
+        sys.exit()
+
+    board[inputDestination-1] = inputChoice
+
+    #game is over if there is a winner or a tie
+    gameOver = check_for_winner(board) or check_for_tie(board)
+
+    #current board status
+    dispay_board(board)
+
+    if gameOver == True:
+        inputNewGame = input("Do you want to start a new game? (Yes/No)")
+        if inputNewGame == 'Yes':
+            board = ['-']*9
+            gameOver = False
+            print("New game started")
